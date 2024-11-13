@@ -5,7 +5,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def adams_bashforth_method(dv_dt, initial_conditions, t0, tf, h, order=1):
     # Implementación del Método de Adams-Bashforth de cuarto orden.
     # Calcula los primeros tres valores con RK4 antes de usar Adams-Bashforth, ya que este método es de múltiples pasos.
@@ -67,14 +66,12 @@ def adams_bashforth_method(dv_dt, initial_conditions, t0, tf, h, order=1):
 
 def rk4_method(dv_dt, initial_conditions, t0, tf, h, order=1):
     # Método de Runge-Kutta de 4º Orden (RK4) para mayor precisión.
-    # Parámetros similares al método de Euler.
 
-    t_values = np.arange(t0, tf, h)  # Genera los valores de tiempo
-    results = [initial_conditions]  # Almacena los resultados de cada paso
+    t_values = np.arange(t0, tf, h)
+    results = [initial_conditions]
 
     for t in t_values[:-1]:
         if order == 1:
-            # Caso para ED de primer orden
             v = results[-1]
             k1 = dv_dt(v)
             k2 = dv_dt(v + h * k1 / 2)
@@ -83,7 +80,6 @@ def rk4_method(dv_dt, initial_conditions, t0, tf, h, order=1):
             v_next = v + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
             results.append(v_next)
         elif order == 2:
-            # Caso para ED de segundo orden o sistema de EDs
             x, v = results[-1]
             dx1, dv1 = dv_dt(x, v)
             dx2, dv2 = dv_dt(x + h * dx1 / 2, v + h * dv1 / 2)
@@ -93,25 +89,18 @@ def rk4_method(dv_dt, initial_conditions, t0, tf, h, order=1):
             v_next = v + (h / 6) * (dv1 + 2 * dv2 + 2 * dv3 + dv4)
             results.append((x_next, v_next))
 
-    return t_values, np.array(results)  # Retorna tiempos y resultados
-
+    return t_values, np.array(results)
 
 def simulate(dv_dt, t0=0, tf=10, h=0.1, eq_type="first_order"):
     # Función principal de simulación que ejecuta ambos métodos (Adams-Bashforth y RK4) y grafica los resultados.
-    # Parámetros:
-    # dv_dt: función de la ED a resolver
-    # t0: tiempo inicial
-    # tf: tiempo final
-    # h: tamaño del paso
-    # eq_type: tipo de ED (first_order, second_order o system)
 
     # Condiciones iniciales según el tipo de ED
     if eq_type == "first_order":
-        initial_conditions = 0  # Condición inicial para velocidad (primer orden)
+        initial_conditions = 0
     elif eq_type == "second_order":
-        initial_conditions = (1, 0)  # Condiciones iniciales para posición y velocidad (segundo orden)
+        initial_conditions = (1, 0)
     elif eq_type == "system":
-        initial_conditions = np.array([1, 1])  # Condiciones iniciales para un sistema de EDs
+        initial_conditions = np.array([1, 1])
 
     # Ejecuta el método de Adams-Bashforth
     t_adams, results_adams = adams_bashforth_method(dv_dt, initial_conditions, t0, tf, h,
@@ -119,6 +108,10 @@ def simulate(dv_dt, t0=0, tf=10, h=0.1, eq_type="first_order"):
 
     # Ejecuta el método de Runge-Kutta de 4º Orden (RK4)
     t_rk4, results_rk4 = rk4_method(dv_dt, initial_conditions, t0, tf, h, order=(1 if eq_type == "first_order" else 2))
+
+    # Calcular el Error Cuadrático Medio (MSE) entre los resultados de Adams-Bashforth y RK4
+    mse = np.mean((results_adams - results_rk4) ** 2)
+    print(f"Error cuadrático medio (MSE) entre Adams-Bashforth y RK4: {mse}")
 
     # Grafica los resultados para comparar ambos métodos
     plt.plot(t_adams, results_adams[:, 0] if eq_type != "first_order" else results_adams, label="Adams-Bashforth", linestyle="--")
@@ -128,4 +121,3 @@ def simulate(dv_dt, t0=0, tf=10, h=0.1, eq_type="first_order"):
     plt.legend()
     plt.title(f"Simulación de {eq_type} con Adams-Bashforth y RK4")
     plt.show()
-

@@ -38,7 +38,7 @@ def main():
     # Parámetros de simulación
     t0, tf, h = 0, 10, 0.1  # Tiempo inicial, tiempo final, y tamaño del paso
 
-    # Ejecuta la simulación con ambos métodos (Euler y RK4) automáticamente
+    # Ejecuta la simulación con ambos métodos (Adams y RK4) automáticamente
     simulate(eq_func, t0, tf, h, eq_type)
 
 
